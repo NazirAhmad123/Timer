@@ -34,3 +34,266 @@
         }
 
         .container {
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: slideUpFade 1.2s var(--ease-out-expo) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 100; 
+            font-size: clamp(4.5rem, 22vw, 6.5rem);
+            letter-spacing: 0.05em; 
+            line-height: 0.8;
+            margin-bottom: 4.5rem;
+            font-variant-numeric: tabular-nums;
+            user-select: none;
+            transition: all 0.8s var(--ease-out-expo);
+        }
+
+        .is-stacked #timer {
+            flex-direction: column;
+            font-size: clamp(6.5rem, 32vw, 9.5rem);
+            margin-bottom: 3.5rem;
+            letter-spacing: 0;
+        }
+
+        .is-stacked #s {
+            opacity: 0.45;
+            display: inline-block;
+            transform: scaleX(0.95);
+        }
+
+        .colon { opacity: 0.15; margin: 0 4px; }
+        .is-stacked .colon { display: none; } 
+
+        .is-running .colon { animation: pulse 1s step-end infinite; }
+        @keyframes pulse { 50% { opacity: 0.05; } }
+
+        .is-paused #timer { opacity: 0.15; transform: scale(0.98); }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            padding: 0 60px;
+        }
+
+        button {
+            width: 100%;
+            background: #f8f8f8;
+            border: none;
+            padding: 1.1rem 0;
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            color: var(--ink);
+            transition: all 0.4s var(--ease-out-expo);
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        button.primary { background-color: var(--ink); color: var(--paper); }
+        button:hover { transform: translateY(-1px); background-color: #ededed; }
+
+        #resetBtn {
+            background: transparent;
+            color: var(--ink-muted);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .is-dirty #resetBtn { opacity: 1; pointer-events: auto; }
+
+        #viewSwitcher {
+            margin-top: 2.2rem;
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            cursor: pointer;
+            background-color: var(--ink-faint);
+            padding: 10px 22px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 1px solid #eee;
+        }
+
+        #reminder {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--light-red);
+            color: var(--text-red);
+            padding: 14px 40px;
+            border-radius: 50px;
+            border: 1px solid var(--border-red);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transition: all 0.8s var(--ease-out-expo);
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(217, 78, 78, 0.1);
+        }
+
+        #reminder.show { bottom: 40px; }
+
+        .footer {
+            margin-top: 3.5rem;
+            font-size: 0.45rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="is-stacked">
+
+<div class="container">
+    <div id="timer">
+        <span id="m">02</span><span class="colon">:</span><span id="s">30</span>
+    </div>
+    
+    <div class="controls">
+        <button id="toggleBtn" class="primary">Start</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+    <div id="viewSwitcher">Toggle Layout</div>
+
+    <div class="footer">
+        made with ♥<br>
+        by Nazir Noori
+    </div>
+</div>
+
+<div id="reminder">SUBMIT</div>
+
+<script>
+    const DURATION = 150; 
+    let timeLeft = DURATION;
+    let timerId = null;
+    let expectedTime = null;
+    let audioCtx = null;
+
+    const elBody = document.body;
+    const elMin = document.getElementById('m');
+    const elSec = document.getElementById('s');
+    const elToggle = document.getElementById('toggleBtn');
+    const elReset = document.getElementById('resetBtn');
+    const elView = document.getElementById('viewSwitcher');
+    const elReminder = document.getElementById('reminder');
+
+    elView.addEventListener('click', () => elBody.classList.toggle('is-stacked'));
+
+    const initAudio = () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); };
+
+    const playNotification = () => {
+        if (!audioCtx) return;
+        const playTone = (delay) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const startTime = audioCtx.currentTime + delay;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, startTime); 
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(0.15, startTime + 0.1); 
+            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.8);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.8);
+        };
+        playTone(0);
+        playTone(1.0);
+        playTone(2.0);
+    };
+
+    const updateUI = () => {
+        const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const s = (timeLeft % 60).toString().padStart(2, '0');
+        elMin.textContent = m;
+        elSec.textContent = s;
+        document.title = `${m}:${s} — Timer`;
+        timeLeft !== DURATION ? elBody.classList.add('is-dirty') : elBody.classList.remove('is-dirty');
+    };
+
+    const tick = () => {
+        if (timeLeft > 0) {
+            const now = Date.now();
+            const drift = now - expectedTime;
+            timeLeft--;
+            updateUI();
+            expectedTime += 1000;
+            timerId = setTimeout(tick, Math.max(0, 1000 - drift));
+        } else {
+            complete();
+        }
+    };
+
+    const start = () => {
+        initAudio();
+        // Clear the red reminder bar when starting/resuming
+        elReminder.classList.remove('show');
+        
+        elBody.classList.add('is-running');
+        elBody.classList.remove('is-paused');
+        elToggle.textContent = "Pause";
+        expectedTime = Date.now() + 1000;
+        timerId = setTimeout(tick, 1000);
+    };
+
+    const pause = () => {
+        elBody.classList.remove('is-running');
+        elBody.classList.add('is-paused');
+        clearTimeout(timerId);
+        timerId = null;
+        elToggle.textContent = "Resume";
+    };
+
+    const complete = () => {
+        pause();
+        elBody.classList.remove('is-paused', 'is-dirty');
+        playNotification();
+        // Show reminder bar persistently
+        elReminder.classList.add('show');
+        elToggle.textContent = "Start";
+        timeLeft = DURATION; 
+        updateUI();
+    };
+
+    const reset = () => {
+        pause();
+        elReminder.classList.remove('show'); // Clear reminder on reset too
+        elBody.classList.remove('is-paused', 'is-dirty');
+        timeLeft = DURATION;
+        elToggle.textContent = "Start";
+        updateUI();
+    };
+
+    elToggle.addEventListener('click', () => (timerId ? pause() : start()));
+    elReset.addEventListener('click', reset);
+    updateUI();
+</script>
+
+</body>
+</html>
