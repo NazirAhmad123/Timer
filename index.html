@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>02:30 | Timer</title>
+    <title>Timer</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Ubuntu:wght@400;500;700&display=swap');
 
         :root {
             --paper: #ffffff;
             --ink: #000000;
-            --ink-muted: #e0e0e0;
+            --ink-muted: #f2f2f2;
             --heart-red: #ff4d4d;
-            --reminder-yellow: #fff9db;
-            --action-bg: #fff5f5; 
-            --action-text-deep: #742a2a;
+            --action-border: #feb2b2;
+            --action-text: #742a2a;
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -31,89 +30,22 @@
             color: var(--ink);
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
-            transition: background-color 1.5s var(--ease-out-expo), color 1s var(--ease-out-expo);
+            transition: background 0.8s var(--ease-out-expo);
         }
 
-        body.finished {
-            background-color: var(--action-bg);
-            animation: breatheRed 4s infinite alternate var(--ease-out-expo);
-        }
-
-        @keyframes breatheRed {
-            from { background-color: #fff5f5; }
-            to { background-color: #ffebeb; }
-        }
-
-        body.finished .adj-btn {
-            background: transparent;
-            color: var(--action-text-deep);
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
-
-        /* --- COMMAND PALETTE --- */
-        .info-trigger {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            width: 32px;
-            height: 32px;
-            border: 1.2px solid var(--ink);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            cursor: pointer;
-            opacity: 0.15;
-            transition: all 0.4s var(--ease-out-expo);
-            z-index: 1001;
-        }
-
-        /* --- CORE CONTAINER --- */
         .container {
             text-align: center;
-            width: 100%;
+            width: 90%;
             max-width: 450px;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: all 0.8s var(--ease-out-expo);
+            transition: transform 1s var(--ease-out-expo);
         }
 
-        /* Small Screen Fluid Adjustment */
-        @media (max-width: 400px) {
-            body {
-                justify-content: flex-start; /* Shift right (to show more left content) or left */
-                padding-left: 20px;
-            }
-            .container {
-                align-items: flex-start;
-                text-align: left;
-            }
-            #timer {
-                justify-content: flex-start !important;
-            }
-            .editable-time {
-                font-size: min(28vw, 6rem) !important;
-            }
-            .set-timer-hint {
-                font-size: 0.45rem !important;
-                margin-left: 5px;
-            }
-            .controls, .adjusters {
-                max-width: 280px;
-            }
-        }
-
-        .set-timer-hint {
-            font-size: 0.55rem;
-            letter-spacing: 0.5em;
-            text-transform: uppercase;
-            font-weight: 700;
-            opacity: 0.2;
-            margin-bottom: 1.5rem;
+        body.finished .container {
+            transform: translateY(-10px);
         }
 
         #timer {
@@ -123,129 +55,143 @@
             font-family: 'Montserrat', sans-serif;
             margin-bottom: 2rem;
             width: 100%;
-            transition: flex-direction 0.5s var(--ease-out-expo);
         }
 
         .editable-time {
             color: var(--ink);
             font-weight: 100;
-            font-size: min(20vw, 7rem);
+            font-size: min(20vw, 7.5rem);
             outline: none;
             line-height: 0.8;
-            letter-spacing: -0.01em;
-            transition: color 1s var(--ease-out-expo);
+            letter-spacing: -0.02em;
         }
 
         .is-stacked #timer { flex-direction: column; }
-        .is-stacked .editable-time { font-size: min(35vw, 9rem); }
+        .is-stacked .editable-time { font-size: min(32vw, 9.5rem); }
         .is-stacked .colon { display: none; }
 
-        .colon { opacity: 0.15; font-size: min(10vw, 3rem); margin: 0 8px; font-weight: 100; }
-        
-        /* --- ADJUSTERS --- */
+        .colon { opacity: 0.1; font-size: min(10vw, 3rem); margin: 0 10px; font-weight: 100; }
+
         .adjusters {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 2.5rem;
             width: 100%;
-            transition: all 1s var(--ease-out-expo);
+            transition: opacity 0.8s var(--ease-out-expo);
         }
-        .is-running .adjusters { opacity: 0.15; pointer-events: none; transform: scale(0.98); }
+        .is-running .adjusters { opacity: 0.1; pointer-events: none; }
 
         .adj-btn {
-            background: #fafafa;
+            background: var(--ink-muted);
             border: none;
-            padding: 15px 5px;
-            font-size: 0.65rem;
-            font-family: 'Ubuntu';
+            padding: 14px 4px;
+            font-size: 0.6rem;
             font-weight: 700;
             color: var(--ink);
             cursor: pointer;
             flex: 1;
-            border-radius: 14px;
-            transition: all 0.6s var(--ease-out-expo);
+            border-radius: 12px;
+            transition: transform 0.2s, background 0.3s;
         }
-        .adj-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
+        .adj-btn:hover { background: #ececec; transform: translateY(-2px); }
 
         .controls { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
         button.action {
             width: 100%;
             background: var(--paper);
-            border: 1.5px solid var(--ink);
-            padding: 1.4rem 0;
-            font-size: 0.7rem;
+            border: 1.2px solid var(--ink);
+            padding: 1.3rem 0;
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 0.5em;
+            letter-spacing: 0.4em;
             text-transform: uppercase;
             cursor: pointer;
-            border-radius: 18px;
-            transition: all 0.6s var(--ease-out-expo);
+            border-radius: 16px;
+            transition: all 0.4s var(--ease-out-expo);
         }
 
         button.primary { background-color: var(--ink); color: var(--paper); }
 
-        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); margin-top: 5px; }
+        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); margin-top: 8px; }
         .is-dirty #resetBtn { opacity: 0.3; pointer-events: auto; }
 
-        #viewSwitcher {
-            margin-top: 1.5rem;
-            font-size: 0.55rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: #ccc;
-            background: none; border: none; cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        /* --- FLUID REMINDER PILL --- */
+        /* --- NOTIFICATION PILL (FIXED) --- */
         #reminder {
             position: fixed;
-            bottom: 45px;
+            bottom: 40px;
             left: 50%;
-            transform: translate(-50%, 120%) scale(0.8);
-            background: #feb2b2;
-            color: var(--action-text-deep);
-            padding: 16px 32px;
+            transform: translate(-50%, 200px);
+            width: auto;
+            max-width: 90vw; 
+            background: var(--action-border);
+            color: var(--action-text);
+            padding: 18px 28px;
             font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            box-shadow: 0 20px 40px rgba(116, 42, 42, 0.15);
             border-radius: 100px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap; 
             opacity: 0;
-            transition: all 1s var(--ease-out-expo);
+            transition: all 0.8s var(--ease-out-expo);
             z-index: 2000;
-            white-space: nowrap;
             pointer-events: none;
         }
+
         #reminder.show { 
-            transform: translate(-50%, 0) scale(1); 
+            transform: translate(-50%, 0); 
             opacity: 1; 
-            animation: fluidPulse 3s infinite ease-in-out;
+            animation: softPulse 2.5s infinite ease-in-out;
         }
 
-        @keyframes fluidPulse {
-            0%, 100% { box-shadow: 0 20px 40px rgba(116, 42, 42, 0.15); }
-            50% { box-shadow: 0 10px 25px rgba(116, 42, 42, 0.25); transform: translate(-50%, -3px) scale(1.02); }
+        @keyframes softPulse {
+            0%, 100% { transform: translate(-50%, 0) scale(1); }
+            50% { transform: translate(-50%, -5px) scale(1.02); }
         }
 
+        /* --- FOOTER (FIXED NAME CASE) --- */
         .footer { 
             margin-top: 4rem; 
-            opacity: 0.15; 
-            font-size: 0.5rem; 
+            opacity: 0.2; 
+            font-size: 0.55rem; 
             letter-spacing: 0.2em;
             line-height: 1.8;
-            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .footer a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 700;
+            transition: opacity 0.3s;
+            text-transform: uppercase; /* FORCED UPPERCASE */
+        }
+
+        .footer a:hover {
+            opacity: 1;
+            color: var(--ink);
+        }
+
+        .heart { color: var(--heart-red); }
+
+        /* Simplified media query - text remains "COMPLETE" regardless of size */
+        @media (max-width: 350px) {
+            #reminder {
+                padding: 12px 20px;
+                font-size: 0.55rem;
+            }
         }
     </style>
 </head>
 <body class="is-stacked">
 
-<div class="info-trigger">?</div>
-
 <div class="container">
-    <div class="set-timer-hint">Set Timer</div>
+    <div style="font-size: 0.5rem; letter-spacing: 0.6em; text-transform: uppercase; opacity: 0.2; margin-bottom: 1.5rem;">Timer</div>
     
     <div id="timer">
         <span id="m" class="editable-time" contenteditable="true">02</span>
@@ -262,17 +208,16 @@
     
     <div class="controls">
         <button id="toggleBtn" class="action primary">Start</button>
-        <button id="resetBtn" class="action">Reset Session</button>
+        <button id="resetBtn" class="action">Reset</button>
     </div>
 
-    <button id="viewSwitcher">Layout</button>
-
     <footer class="footer">
-        made with ♥<br>by Nazir Noori
+        made with <span class="heart">♥</span><br>
+        by <a href="https://github.com/NazirAhmad123" target="_blank">NAZIR NOORI</a>
     </footer>
 </div>
 
-<div id="reminder">Action Required</div>
+<div id="reminder">COMPLETE</div>
 
 <script>
     let timeLeft = 150;
@@ -287,9 +232,6 @@
     const elToggle = document.getElementById('toggleBtn');
     const elReset = document.getElementById('resetBtn');
     const elReminder = document.getElementById('reminder');
-    const elView = document.getElementById('viewSwitcher');
-
-    elView.addEventListener('click', () => elBody.classList.toggle('is-stacked'));
 
     const initAudio = () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); };
 
@@ -319,7 +261,7 @@
         const s = (Math.max(0, timeLeft) % 60).toString().padStart(2, '0');
         elMin.innerText = m;
         elSec.innerText = s;
-        document.title = (timeLeft <= 0 && !timerId) ? "!! DONE !!" : `${m}:${s} | Timer`;
+        document.title = (timeLeft <= 0 && !timerId) ? "!! COMPLETE !!" : `${m}:${s} | Timer`;
         timeLeft !== initialDuration ? elBody.classList.add('is-dirty') : elBody.classList.remove('is-dirty');
     };
 
