@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer</title>
+    <title>02:30 | Timer</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Ubuntu:wght@400;500;700&display=swap');
 
@@ -34,7 +34,6 @@
             transition: background-color 1.5s var(--ease-out-expo), color 1s var(--ease-out-expo);
         }
 
-        /* --- THE ACTION STATE --- */
         body.finished {
             background-color: var(--action-bg);
             animation: breatheRed 4s infinite alternate var(--ease-out-expo);
@@ -70,41 +69,8 @@
             transition: all 0.4s var(--ease-out-expo);
             z-index: 1001;
         }
-        .info-trigger:hover { opacity: 1; transform: scale(1.1); }
 
-        .guide-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s var(--ease-out-expo);
-            z-index: 1000;
-        }
-
-        .guide-card {
-            background: white;
-            padding: 40px;
-            border-radius: 28px;
-            box-shadow: 0 25px 55px rgba(0,0,0,0.06);
-            width: 90%;
-            max-width: 320px;
-            transform: scale(0.9) translateY(15px);
-            transition: all 0.5s var(--ease-out-expo);
-        }
-
-        .info-trigger:hover + .guide-overlay { opacity: 1; pointer-events: auto; }
-        .info-trigger:hover + .guide-overlay .guide-card { transform: scale(1) translateY(0); }
-
-        .guide-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.75rem; color: #777; }
-        .kbd { font-weight: 700; color: var(--ink); text-transform: uppercase; }
-
-        /* --- CORE TIMER --- */
+        /* --- CORE CONTAINER --- */
         .container {
             text-align: center;
             width: 100%;
@@ -113,6 +79,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: all 0.8s var(--ease-out-expo);
+        }
+
+        /* Small Screen Fluid Adjustment */
+        @media (max-width: 400px) {
+            body {
+                justify-content: flex-start; /* Shift right (to show more left content) or left */
+                padding-left: 20px;
+            }
+            .container {
+                align-items: flex-start;
+                text-align: left;
+            }
+            #timer {
+                justify-content: flex-start !important;
+            }
+            .editable-time {
+                font-size: min(28vw, 6rem) !important;
+            }
+            .set-timer-hint {
+                font-size: 0.45rem !important;
+                margin-left: 5px;
+            }
+            .controls, .adjusters {
+                max-width: 280px;
+            }
         }
 
         .set-timer-hint {
@@ -149,9 +141,7 @@
         .is-stacked .colon { display: none; }
 
         .colon { opacity: 0.15; font-size: min(10vw, 3rem); margin: 0 8px; font-weight: 100; }
-        .is-running .colon { animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.4; } }
-
+        
         /* --- ADJUSTERS --- */
         .adjusters {
             display: flex;
@@ -177,12 +167,6 @@
         }
         .adj-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
 
-        @media (max-width: 380px) {
-            .adjusters { flex-direction: column; }
-            .adj-btn { width: 100%; border-radius: 10px; }
-            .editable-time { font-size: 24vw; }
-        }
-
         .controls { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
         button.action {
@@ -200,9 +184,8 @@
         }
 
         button.primary { background-color: var(--ink); color: var(--paper); }
-        button.action:active { transform: scale(0.98); }
 
-        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); }
+        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); margin-top: 5px; }
         .is-dirty #resetBtn { opacity: 0.3; pointer-events: auto; }
 
         #viewSwitcher {
@@ -214,57 +197,52 @@
             background: none; border: none; cursor: pointer;
             transition: color 0.3s;
         }
-        #viewSwitcher:hover { color: var(--ink); }
 
-        /* --- ONE-LINE REMINDER --- */
+        /* --- FLUID REMINDER PILL --- */
         #reminder {
             position: fixed;
-            bottom: 40px;
+            bottom: 45px;
             left: 50%;
-            transform: translate(-50%, 150px);
+            transform: translate(-50%, 120%) scale(0.8);
             background: #feb2b2;
             color: var(--action-text-deep);
-            padding: 18px 35px;
-            font-size: 0.7rem;
+            padding: 16px 32px;
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.04);
+            box-shadow: 0 20px 40px rgba(116, 42, 42, 0.15);
             border-radius: 100px;
             opacity: 0;
-            transition: all 0.8s var(--ease-out-expo);
+            transition: all 1s var(--ease-out-expo);
             z-index: 2000;
             white-space: nowrap;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            pointer-events: none;
         }
-        #reminder.show { transform: translate(-50%, 0); opacity: 1; }
+        #reminder.show { 
+            transform: translate(-50%, 0) scale(1); 
+            opacity: 1; 
+            animation: fluidPulse 3s infinite ease-in-out;
+        }
 
-        /* TWO-LINE FOOTER */
+        @keyframes fluidPulse {
+            0%, 100% { box-shadow: 0 20px 40px rgba(116, 42, 42, 0.15); }
+            50% { box-shadow: 0 10px 25px rgba(116, 42, 42, 0.25); transform: translate(-50%, -3px) scale(1.02); }
+        }
+
         .footer { 
             margin-top: 4rem; 
-            opacity: 0.2; 
-            font-size: 0.55rem; 
+            opacity: 0.15; 
+            font-size: 0.5rem; 
             letter-spacing: 0.2em;
             line-height: 1.8;
             text-align: center;
         }
-        .heart:hover { color: var(--heart-red); }
     </style>
 </head>
 <body class="is-stacked">
 
 <div class="info-trigger">?</div>
-<div class="guide-overlay">
-    <div class="guide-card">
-        <h4 style="font-size:0.55rem; letter-spacing:0.4em; text-transform:uppercase; margin-bottom:25px; text-align:center; opacity:0.4;">Command Palette</h4>
-        <div class="guide-row"><span>Start / Pause</span> <span class="kbd">Space</span></div>
-        <div class="guide-row"><span>Reset All</span> <span class="kbd">R</span></div>
-        <div class="guide-row"><span>Adjust Min</span> <span class="kbd">↑ / ↓</span></div>
-        <div class="guide-row"><span>Adjust Sec</span> <span class="kbd">← / →</span></div>
-    </div>
-</div>
 
 <div class="container">
     <div class="set-timer-hint">Set Timer</div>
@@ -287,10 +265,10 @@
         <button id="resetBtn" class="action">Reset Session</button>
     </div>
 
-    <button id="viewSwitcher">Change Layout</button>
+    <button id="viewSwitcher">Layout</button>
 
     <footer class="footer">
-        made with <span class="heart" style="transition:0.3s; cursor:default;">♥</span><br>by Nazir Noori
+        made with ♥<br>by Nazir Noori
     </footer>
 </div>
 
@@ -317,31 +295,20 @@
 
     const playNotification = () => {
         if (!audioCtx) return;
-
         const playZenTone = (freq, start, duration) => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             const filter = audioCtx.createBiquadFilter();
-
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
-
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(800, audioCtx.currentTime + start);
-
             gain.gain.setValueAtTime(0, audioCtx.currentTime + start);
-            gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + start + 0.1);
+            gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + start + 0.1);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + duration);
-
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start(audioCtx.currentTime + start);
-            osc.stop(audioCtx.currentTime + start + duration);
+            osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + start); osc.stop(audioCtx.currentTime + start + duration);
         };
-
-        // Rolling E-Major zen chord
         playZenTone(329.63, 0, 2.5);
         playZenTone(415.30, 0.2, 2.5);
         playZenTone(493.88, 0.4, 2.5);
@@ -406,7 +373,7 @@
         elBody.classList.add('finished');
         playNotification();
         elReminder.classList.add('show');
-        elToggle.textContent = "Start New";
+        elToggle.textContent = "Restart";
         timeLeft = initialDuration;
         updateUI();
     };
@@ -419,30 +386,6 @@
         elToggle.textContent = "Start";
         updateUI();
     };
-
-    window.addEventListener('keydown', (e) => {
-        if (document.activeElement.contentEditable === 'true') return;
-        switch(e.code) {
-            case 'Space': e.preventDefault(); timerId ? pause() : start(); break;
-            case 'KeyR': reset(); break;
-            case 'ArrowUp': adjustTime(60); break;
-            case 'ArrowDown': adjustTime(-60); break;
-            case 'ArrowRight': adjustTime(30); break;
-            case 'ArrowLeft': adjustTime(-30); break;
-        }
-    });
-
-    [elMin, elSec].forEach(el => {
-        el.addEventListener('blur', () => {
-            let val = parseInt(el.innerText.replace(/\D/g,'')) || 0;
-            el.innerText = val.toString().padStart(2, '0');
-            syncTime();
-            initialDuration = timeLeft;
-        });
-        el.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
-        });
-    });
 
     elToggle.addEventListener('click', () => (timerId ? pause() : start()));
     elReset.addEventListener('click', reset);
