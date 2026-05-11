@@ -30,7 +30,6 @@
             color: var(--ink);
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
-            transition: background 0.8s var(--ease-out-expo);
         }
 
         .container {
@@ -44,9 +43,7 @@
             transition: transform 1s var(--ease-out-expo);
         }
 
-        body.finished .container {
-            transform: translateY(-10px);
-        }
+        body.finished .container { transform: translateY(-10px); }
 
         #timer {
             display: flex;
@@ -72,6 +69,7 @@
 
         .colon { opacity: 0.1; font-size: min(10vw, 3rem); margin: 0 10px; font-weight: 100; }
 
+        /* --- ADJUSTERS --- */
         .adjusters {
             display: flex;
             gap: 8px;
@@ -91,39 +89,17 @@
             cursor: pointer;
             flex: 1;
             border-radius: 12px;
-            transition: transform 0.2s, background 0.3s;
+            transition: all 0.3s var(--ease-out-expo);
         }
-        .adj-btn:hover { background: #ececec; transform: translateY(-2px); }
+        .adj-btn sub { font-size: 0.4rem; bottom: 0; }
 
-        .controls { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-
-        button.action {
-            width: 100%;
-            background: var(--paper);
-            border: 1.2px solid var(--ink);
-            padding: 1.3rem 0;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 16px;
-            transition: all 0.4s var(--ease-out-expo);
-        }
-
-        button.primary { background-color: var(--ink); color: var(--paper); }
-
-        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); margin-top: 8px; }
-        .is-dirty #resetBtn { opacity: 0.3; pointer-events: auto; }
-
-        /* --- NOTIFICATION PILL (FIXED) --- */
+        /* --- ACTION PILL --- */
         #reminder {
             position: fixed;
             bottom: 40px;
             left: 50%;
             transform: translate(-50%, 200px);
             width: auto;
-            max-width: 90vw; 
             background: var(--action-border);
             color: var(--action-text);
             padding: 18px 28px;
@@ -143,18 +119,14 @@
             pointer-events: none;
         }
 
-        #reminder.show { 
-            transform: translate(-50%, 0); 
-            opacity: 1; 
-            animation: softPulse 2.5s infinite ease-in-out;
-        }
+        #reminder.show { transform: translate(-50%, 0); opacity: 1; animation: softPulse 2.5s infinite ease-in-out; }
 
         @keyframes softPulse {
             0%, 100% { transform: translate(-50%, 0) scale(1); }
             50% { transform: translate(-50%, -5px) scale(1.02); }
         }
 
-        /* --- FOOTER (FIXED NAME CASE) --- */
+        /* --- FOOTER --- */
         .footer { 
             margin-top: 4rem; 
             opacity: 0.2; 
@@ -164,28 +136,45 @@
             text-transform: uppercase;
         }
 
-        .footer a {
-            color: inherit;
-            text-decoration: none;
-            font-weight: 700;
-            transition: opacity 0.3s;
-            text-transform: uppercase; /* FORCED UPPERCASE */
-        }
-
-        .footer a:hover {
-            opacity: 1;
-            color: var(--ink);
-        }
+        .footer a { color: inherit; text-decoration: none; font-weight: 700; text-transform: uppercase; }
 
         .heart { color: var(--heart-red); }
 
-        /* Simplified media query - text remains "COMPLETE" regardless of size */
-        @media (max-width: 350px) {
-            #reminder {
-                padding: 12px 20px;
-                font-size: 0.55rem;
+        /* --- SUPER SMALL SCREEN: RAW NUMBERS LAYOUT --- */
+        @media (max-width: 380px) {
+            .adjusters {
+                gap: 20px;
+                justify-content: center;
             }
+            .adj-btn {
+                background: transparent; /* Remove button look */
+                flex: none;
+                padding: 0;
+                font-size: 0.8rem; /* Make numbers legible */
+                opacity: 0.4;
+            }
+            .adj-btn:hover { background: transparent; transform: scale(1.1); opacity: 1; }
+            
+            #reminder { padding: 12px 20px; font-size: 0.55rem; }
         }
+
+        .controls { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        button.action {
+            width: 100%;
+            background: var(--paper);
+            border: 1.2px solid var(--ink);
+            padding: 1.3rem 0;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 16px;
+            transition: all 0.4s var(--ease-out-expo);
+        }
+        button.primary { background-color: var(--ink); color: var(--paper); }
+        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); margin-top: 8px; }
+        .is-dirty #resetBtn { opacity: 0.3; pointer-events: auto; }
     </style>
 </head>
 <body class="is-stacked">
@@ -200,10 +189,10 @@
     </div>
 
     <div class="adjusters">
-        <button class="adj-btn" onclick="adjustTime(-30)">-30s</button>
-        <button class="adj-btn" onclick="adjustTime(-60)">-1M</button>
-        <button class="adj-btn" onclick="adjustTime(60)">+1M</button>
-        <button class="adj-btn" onclick="adjustTime(30)">+30s</button>
+        <button class="adj-btn" onclick="adjustTime(-30)">-30<sub>S</sub></button>
+        <button class="adj-btn" onclick="adjustTime(-60)">-1<sub>M</sub></button>
+        <button class="adj-btn" onclick="adjustTime(60)">+1<sub>M</sub></button>
+        <button class="adj-btn" onclick="adjustTime(30)">+30<sub>S</sub></button>
     </div>
     
     <div class="controls">
