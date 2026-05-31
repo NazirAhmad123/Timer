@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timer</title>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Ubuntu:wght@400;500;700&display=swap');
 
@@ -15,9 +16,14 @@
             --action-border: #feb2b2;
             --action-text: #742a2a;
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-soft-spring: cubic-bezier(0.22, 1.18, 0.36, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
             margin: 0;
@@ -25,6 +31,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            min-height: 100svh;
             background-color: var(--paper);
             font-family: 'Ubuntu', sans-serif;
             color: var(--ink);
@@ -34,71 +41,167 @@
 
         .container {
             text-align: center;
-            width: 90%;
-            max-width: 450px;
-            padding: 20px;
+            width: min(92vw, 450px);
+            padding: clamp(16px, 4vw, 24px);
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 1s var(--ease-out-expo);
+            transition: transform 900ms var(--ease-out-expo);
         }
 
-        body.finished .container { transform: translateY(-10px); }
+        body.finished .container {
+            transform: translateY(-10px);
+        }
+
+        .label {
+            font-size: 0.5rem;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            opacity: 0.2;
+            margin-bottom: clamp(1rem, 3vh, 1.5rem);
+        }
 
         #timer {
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Montserrat', sans-serif;
-            margin-bottom: 2rem;
+            margin-bottom: clamp(1.4rem, 4vh, 2rem);
             width: 100%;
         }
 
         .editable-time {
             color: var(--ink);
             font-weight: 100;
-            font-size: min(20vw, 7.5rem);
+            font-size: clamp(4.8rem, 20vw, 7.5rem);
             outline: none;
-            line-height: 0.8;
-            letter-spacing: -0.02em;
+            line-height: 0.82;
+            letter-spacing: -0.04em;
+            min-width: 1.3em;
         }
 
-        .is-stacked #timer { flex-direction: column; }
-        .is-stacked .editable-time { font-size: min(32vw, 9.5rem); }
-        .is-stacked .colon { display: none; }
+        .is-stacked #timer {
+            flex-direction: column;
+        }
 
-        .colon { opacity: 0.1; font-size: min(10vw, 3rem); margin: 0 10px; font-weight: 100; }
+        .is-stacked .editable-time {
+            font-size: clamp(5.6rem, 30vw, 9.5rem);
+        }
+
+        .is-stacked .colon {
+            display: none;
+        }
+
+        .colon {
+            opacity: 0.1;
+            font-size: clamp(2rem, 10vw, 3rem);
+            margin: 0 10px;
+            font-weight: 100;
+        }
 
         /* --- ADJUSTERS --- */
         .adjusters {
             display: flex;
             gap: 8px;
-            margin-bottom: 2.5rem;
+            margin-bottom: clamp(1.6rem, 5vh, 2.5rem);
             width: 100%;
-            transition: opacity 0.8s var(--ease-out-expo);
+            transition:
+                opacity 700ms var(--ease-out-expo),
+                transform 700ms var(--ease-out-expo);
         }
-        .is-running .adjusters { opacity: 0.1; pointer-events: none; }
+
+        .is-running .adjusters {
+            opacity: 0.12;
+            pointer-events: none;
+            transform: translateY(4px);
+        }
 
         .adj-btn {
             background: var(--ink-muted);
             border: none;
             padding: 14px 4px;
+            min-height: 44px;
             font-size: 0.6rem;
             font-weight: 700;
             color: var(--ink);
             cursor: pointer;
             flex: 1;
             border-radius: 12px;
-            transition: all 0.3s var(--ease-out-expo);
+            transition:
+                transform 250ms var(--ease-out-expo),
+                background-color 250ms var(--ease-smooth),
+                opacity 250ms var(--ease-smooth);
         }
-        .adj-btn sub { font-size: 0.4rem; bottom: 0; }
 
-        /* --- ACTION PILL --- */
+        .adj-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .adj-btn:active {
+            transform: scale(0.96);
+        }
+
+        .adj-btn sub {
+            font-size: 0.4rem;
+            bottom: 0;
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button.action {
+            width: 100%;
+            background: var(--paper);
+            border: 1.2px solid var(--ink);
+            padding: 1.3rem 0;
+            min-height: 54px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 16px;
+            transition:
+                transform 250ms var(--ease-out-expo),
+                background-color 250ms var(--ease-smooth),
+                color 250ms var(--ease-smooth),
+                opacity 250ms var(--ease-smooth);
+        }
+
+        button.action:active {
+            transform: scale(0.98);
+        }
+
+        button.primary {
+            background-color: var(--ink);
+            color: var(--paper);
+        }
+
+        #resetBtn {
+            border: none;
+            opacity: 0;
+            pointer-events: none;
+            font-size: 0.55rem;
+            color: var(--ink);
+            margin-top: 8px;
+        }
+
+        .is-dirty #resetBtn {
+            opacity: 0.3;
+            pointer-events: auto;
+        }
+
+        /* --- COMPLETE PILL --- */
         #reminder {
             position: fixed;
-            bottom: 40px;
+            bottom: max(28px, env(safe-area-inset-bottom));
             left: 50%;
-            transform: translate(-50%, 200px);
+            transform: translate(-50%, 160px) scale(0.96);
             width: auto;
             background: var(--action-border);
             color: var(--action-text);
@@ -112,76 +215,428 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            white-space: nowrap; 
+            white-space: nowrap;
             opacity: 0;
-            transition: all 0.8s var(--ease-out-expo);
+            transition:
+                transform 900ms var(--ease-out-expo),
+                opacity 500ms var(--ease-smooth);
             z-index: 2000;
             pointer-events: none;
+            overflow: visible;
+            will-change: transform, opacity;
         }
 
-        #reminder.show { transform: translate(-50%, 0); opacity: 1; animation: softPulse 2.5s infinite ease-in-out; }
+        #reminder.show {
+            transform: translate(-50%, 0) scale(1);
+            opacity: 1;
+            animation: softPulse 3s 900ms ease-in-out infinite;
+        }
 
         @keyframes softPulse {
-            0%, 100% { transform: translate(-50%, 0) scale(1); }
-            50% { transform: translate(-50%, -5px) scale(1.02); }
+            0%, 100% {
+                transform: translate(-50%, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -4px) scale(1.018);
+            }
+        }
+
+        /* --- SMOOTH ACHIEVEMENT EMOJIS --- */
+        .celebration-emoji {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            font-size: 1.12rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.10));
+            transform:
+                translate(-50%, -50%)
+                translate3d(0, 0, 0)
+                scale(0.6)
+                rotate(0deg);
+            will-change: transform, opacity, filter;
+        }
+
+        .emoji-celebrate {
+            --end-x: 56px;
+            --end-y: -40px;
+            --float-x: 3px;
+            --float-y: -5px;
+            --rot: 12deg;
+            --wiggle: 5deg;
+            font-size: 1.25rem;
+        }
+
+        .emoji-trophy {
+            --end-x: 0px;
+            --end-y: -56px;
+            --float-x: 0px;
+            --float-y: -5px;
+            --rot: -4deg;
+            --wiggle: 5deg;
+            font-size: 1.22rem;
+        }
+
+        .emoji-star {
+            --end-x: -54px;
+            --end-y: -36px;
+            --float-x: -3px;
+            --float-y: -4px;
+            --rot: -10deg;
+            --wiggle: -5deg;
+            font-size: 1.05rem;
+        }
+
+        .emoji-clap {
+            --end-x: -60px;
+            --end-y: 22px;
+            --float-x: -4px;
+            --float-y: 3px;
+            --rot: -8deg;
+            --wiggle: 5deg;
+            font-size: 1.05rem;
+        }
+
+        .emoji-sparkle {
+            --end-x: 60px;
+            --end-y: 22px;
+            --float-x: 4px;
+            --float-y: 3px;
+            --rot: 9deg;
+            --wiggle: -5deg;
+            font-size: 1rem;
+        }
+
+        #reminder.show .celebration-emoji {
+            animation:
+                emojiSmoothEnter 1100ms var(--delay, 0s) var(--ease-soft-spring) forwards,
+                emojiSmoothFloat 3600ms calc(var(--delay, 0s) + 1100ms) ease-in-out infinite alternate,
+                emojiSoftGlow 2600ms calc(var(--delay, 0s) + 1100ms) ease-in-out infinite;
+        }
+
+        #reminder.show .emoji-celebrate { --delay: 0ms; }
+        #reminder.show .emoji-trophy { --delay: 80ms; }
+        #reminder.show .emoji-star { --delay: 140ms; }
+        #reminder.show .emoji-clap { --delay: 210ms; }
+        #reminder.show .emoji-sparkle { --delay: 280ms; }
+
+        @keyframes emojiSmoothEnter {
+            0% {
+                opacity: 0;
+                transform:
+                    translate(-50%, -50%)
+                    translate3d(0, 8px, 0)
+                    scale(0.45)
+                    rotate(0deg);
+            }
+
+            45% {
+                opacity: 1;
+                transform:
+                    translate(
+                        calc(-50% + (var(--end-x) * 0.9)),
+                        calc(-50% + (var(--end-y) * 0.9))
+                    )
+                    translate3d(0, 0, 0)
+                    scale(1.12)
+                    rotate(calc(var(--rot) * 0.9));
+            }
+
+            72% {
+                opacity: 1;
+                transform:
+                    translate(
+                        calc(-50% + (var(--end-x) * 1.025)),
+                        calc(-50% + (var(--end-y) * 1.025))
+                    )
+                    translate3d(0, 0, 0)
+                    scale(0.985)
+                    rotate(calc(var(--rot) * 1.05));
+            }
+
+            100% {
+                opacity: 1;
+                transform:
+                    translate(
+                        calc(-50% + var(--end-x)),
+                        calc(-50% + var(--end-y))
+                    )
+                    translate3d(0, 0, 0)
+                    scale(1)
+                    rotate(var(--rot));
+            }
+        }
+
+        @keyframes emojiSmoothFloat {
+            0% {
+                transform:
+                    translate(
+                        calc(-50% + var(--end-x)),
+                        calc(-50% + var(--end-y))
+                    )
+                    translate3d(0, 0, 0)
+                    scale(1)
+                    rotate(var(--rot));
+            }
+
+            100% {
+                transform:
+                    translate(
+                        calc(-50% + var(--end-x) + var(--float-x)),
+                        calc(-50% + var(--end-y) + var(--float-y))
+                    )
+                    translate3d(0, 0, 0)
+                    scale(1.035)
+                    rotate(calc(var(--rot) + var(--wiggle)));
+            }
+        }
+
+        @keyframes emojiSoftGlow {
+            0%, 100% {
+                opacity: 0.84;
+                filter: drop-shadow(0 6px 8px rgba(0,0,0,0.10)) brightness(1);
+            }
+
+            50% {
+                opacity: 1;
+                filter: drop-shadow(0 9px 13px rgba(0,0,0,0.14)) brightness(1.12);
+            }
+        }
+
+        /* --- REFINED SPARKLES --- */
+        #reminder::before,
+        #reminder::after {
+            content: "✦";
+            position: absolute;
+            color: var(--action-text);
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        #reminder::before {
+            top: -16px;
+            left: 18px;
+            font-size: 0.6rem;
+        }
+
+        #reminder::after {
+            right: 18px;
+            bottom: -14px;
+            font-size: 0.5rem;
+        }
+
+        #reminder.show::before {
+            animation: refinedSparkleOne 2200ms 550ms ease-in-out infinite;
+        }
+
+        #reminder.show::after {
+            animation: refinedSparkleTwo 2400ms 750ms ease-in-out infinite;
+        }
+
+        @keyframes refinedSparkleOne {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0.5) rotate(0deg);
+            }
+
+            45% {
+                opacity: 0.7;
+                transform: scale(1.18) rotate(120deg);
+            }
+        }
+
+        @keyframes refinedSparkleTwo {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0.5) rotate(0deg);
+            }
+
+            50% {
+                opacity: 0.65;
+                transform: scale(1.12) rotate(-110deg);
+            }
         }
 
         /* --- FOOTER --- */
-        .footer { 
-            margin-top: 4rem; 
-            opacity: 0.2; 
-            font-size: 0.55rem; 
+        .footer {
+            margin-top: clamp(2.4rem, 7vh, 4rem);
+            opacity: 0.2;
+            font-size: 0.55rem;
             letter-spacing: 0.2em;
             line-height: 1.8;
             text-transform: uppercase;
         }
 
-        .footer a { color: inherit; text-decoration: none; font-weight: 700; text-transform: uppercase; }
+        .footer a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
 
-        .heart { color: var(--heart-red); }
+        .heart {
+            color: var(--heart-red);
+        }
 
-        /* --- SUPER SMALL SCREEN: RAW NUMBERS LAYOUT --- */
-        @media (max-width: 380px) {
+        /* --- SMALL SCREEN IMPROVEMENTS --- */
+        @media (max-width: 420px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .container {
+                min-height: 100svh;
+                justify-content: center;
+                padding-top: max(20px, env(safe-area-inset-top));
+                padding-bottom: max(96px, env(safe-area-inset-bottom));
+            }
+
+            .editable-time {
+                font-size: clamp(4.6rem, 28vw, 7rem);
+            }
+
+            .is-stacked .editable-time {
+                font-size: clamp(5.2rem, 34vw, 8.4rem);
+            }
+
             .adjusters {
-                gap: 20px;
+                gap: 8px;
+                margin-bottom: 1.8rem;
+            }
+
+            .adj-btn {
+                padding: 13px 2px;
+                font-size: 0.58rem;
+                border-radius: 14px;
+            }
+
+            button.action {
+                min-height: 56px;
+                padding: 1.15rem 0;
+                letter-spacing: 0.32em;
+            }
+
+            .footer {
+                margin-top: 2.4rem;
+            }
+
+            #reminder {
+                bottom: max(22px, env(safe-area-inset-bottom));
+                padding: 14px 22px;
+                font-size: 0.58rem;
+                letter-spacing: 0.18em;
+            }
+
+            .celebration-emoji {
+                font-size: 0.9rem;
+            }
+
+            .emoji-celebrate {
+                --end-x: 44px;
+                --end-y: -34px;
+            }
+
+            .emoji-trophy {
+                --end-x: 0px;
+                --end-y: -44px;
+            }
+
+            .emoji-star {
+                --end-x: -42px;
+                --end-y: -32px;
+            }
+
+            .emoji-clap {
+                --end-x: -46px;
+                --end-y: 18px;
+            }
+
+            .emoji-sparkle {
+                --end-x: 46px;
+                --end-y: 18px;
+            }
+        }
+
+        /* --- VERY SMALL SCREEN: MINIMAL ADJUSTERS --- */
+        @media (max-width: 360px) {
+            .adjusters {
+                gap: 14px;
                 justify-content: center;
             }
+
             .adj-btn {
-                background: transparent; /* Remove button look */
+                background: transparent;
                 flex: none;
-                padding: 0;
-                font-size: 0.8rem; /* Make numbers legible */
-                opacity: 0.4;
+                padding: 4px 0;
+                min-height: 32px;
+                font-size: 0.72rem;
+                opacity: 0.45;
             }
-            .adj-btn:hover { background: transparent; transform: scale(1.1); opacity: 1; }
-            
-            #reminder { padding: 12px 20px; font-size: 0.55rem; }
+
+            .adj-btn:hover {
+                background: transparent;
+                transform: scale(1.08);
+                opacity: 1;
+            }
+
+            button.action {
+                letter-spacing: 0.26em;
+            }
+
+            .footer {
+                font-size: 0.5rem;
+                margin-top: 2rem;
+            }
         }
 
-        .controls { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-        button.action {
-            width: 100%;
-            background: var(--paper);
-            border: 1.2px solid var(--ink);
-            padding: 1.3rem 0;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 16px;
-            transition: all 0.4s var(--ease-out-expo);
+        /* --- SHORT SCREEN IMPROVEMENTS --- */
+        @media (max-height: 650px) {
+            .label {
+                margin-bottom: 0.8rem;
+            }
+
+            #timer {
+                margin-bottom: 1.2rem;
+            }
+
+            .adjusters {
+                margin-bottom: 1.4rem;
+            }
+
+            .footer {
+                margin-top: 2rem;
+            }
         }
-        button.primary { background-color: var(--ink); color: var(--paper); }
-        #resetBtn { border: none; opacity: 0; pointer-events: none; font-size: 0.55rem; color: var(--ink); margin-top: 8px; }
-        .is-dirty #resetBtn { opacity: 0.3; pointer-events: auto; }
+
+        /* --- ACCESSIBILITY: REDUCE MOTION --- */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            #reminder.show .celebration-emoji {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body class="is-stacked">
 
 <div class="container">
-    <div style="font-size: 0.5rem; letter-spacing: 0.6em; text-transform: uppercase; opacity: 0.2; margin-bottom: 1.5rem;">Timer</div>
-    
+    <div class="label">
+        Timer
+    </div>
+
     <div id="timer">
         <span id="m" class="editable-time" contenteditable="true">02</span>
         <span class="colon">:</span>
@@ -194,7 +649,7 @@
         <button class="adj-btn" onclick="adjustTime(60)">+1<sub>M</sub></button>
         <button class="adj-btn" onclick="adjustTime(30)">+30<sub>S</sub></button>
     </div>
-    
+
     <div class="controls">
         <button id="toggleBtn" class="action primary">Start</button>
         <button id="resetBtn" class="action">Reset</button>
@@ -206,7 +661,14 @@
     </footer>
 </div>
 
-<div id="reminder">COMPLETE</div>
+<div id="reminder">
+    <span class="celebration-emoji emoji-celebrate">🎉</span>
+    <span class="celebration-emoji emoji-trophy">🏆</span>
+    <span class="celebration-emoji emoji-star">⭐</span>
+    <span class="celebration-emoji emoji-clap">👏</span>
+    <span class="celebration-emoji emoji-sparkle">✨</span>
+    COMPLETE
+</div>
 
 <script>
     let timeLeft = 150;
@@ -222,57 +684,91 @@
     const elReset = document.getElementById('resetBtn');
     const elReminder = document.getElementById('reminder');
 
-    const initAudio = () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); };
+    const initAudio = () => {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    };
 
     const playNotification = () => {
         if (!audioCtx) return;
+
         const playZenTone = (freq, start, duration) => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             const filter = audioCtx.createBiquadFilter();
+
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
+
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(800, audioCtx.currentTime + start);
+
             gain.gain.setValueAtTime(0, audioCtx.currentTime + start);
             gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + start + 0.1);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + duration);
-            osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(audioCtx.currentTime + start); osc.stop(audioCtx.currentTime + start + duration);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(audioCtx.currentTime + start);
+            osc.stop(audioCtx.currentTime + start + duration);
         };
+
         playZenTone(329.63, 0, 2.5);
         playZenTone(415.30, 0.2, 2.5);
         playZenTone(493.88, 0.4, 2.5);
     };
 
     const updateUI = () => {
-        const m = Math.floor(Math.max(0, timeLeft) / 60).toString().padStart(2, '0');
-        const s = (Math.max(0, timeLeft) % 60).toString().padStart(2, '0');
+        const safeTime = Math.max(0, timeLeft);
+        const m = Math.floor(safeTime / 60).toString().padStart(2, '0');
+        const s = (safeTime % 60).toString().padStart(2, '0');
+
         elMin.innerText = m;
         elSec.innerText = s;
-        document.title = (timeLeft <= 0 && !timerId) ? "!! COMPLETE !!" : `${m}:${s} | Timer`;
-        timeLeft !== initialDuration ? elBody.classList.add('is-dirty') : elBody.classList.remove('is-dirty');
+
+        document.title = (timeLeft <= 0 && !timerId)
+            ? "!! COMPLETE !!"
+            : `${m}:${s} | Timer`;
+
+        timeLeft !== initialDuration
+            ? elBody.classList.add('is-dirty')
+            : elBody.classList.remove('is-dirty');
     };
 
     window.adjustTime = (seconds) => {
         syncTime();
         timeLeft = Math.max(0, timeLeft + seconds);
-        if (!timerId) initialDuration = timeLeft;
+
+        if (!timerId) {
+            initialDuration = timeLeft;
+        }
+
         updateUI();
     };
 
     const syncTime = () => {
-        const m = parseInt(elMin.innerText.replace(/\D/g,'')) || 0;
-        const s = parseInt(elSec.innerText.replace(/\D/g,'')) || 0;
+        const m = parseInt(elMin.innerText.replace(/\D/g, '')) || 0;
+        const s = parseInt(elSec.innerText.replace(/\D/g, '')) || 0;
+
         timeLeft = (m * 60) + s;
+    };
+
+    const resetCelebrationAnimation = () => {
+        elReminder.classList.remove('show');
+        void elReminder.offsetWidth;
     };
 
     const tick = () => {
         if (timeLeft > 0) {
             const now = Date.now();
             const drift = now - expectedTime;
+
             timeLeft--;
             updateUI();
+
             expectedTime += 1000;
             timerId = setTimeout(tick, Math.max(0, 1000 - drift));
         } else {
@@ -283,43 +779,57 @@
     const start = () => {
         initAudio();
         syncTime();
+
         if (timeLeft <= 0) return;
+
         elBody.classList.remove('finished');
-        elReminder.classList.remove('show');
+        resetCelebrationAnimation();
+
         elBody.classList.add('is-running');
         elToggle.textContent = "Pause";
+
         expectedTime = Date.now() + 1000;
         timerId = setTimeout(tick, 1000);
     };
 
     const pause = () => {
         elBody.classList.remove('is-running');
+
         clearTimeout(timerId);
         timerId = null;
+
         elToggle.textContent = "Resume";
     };
 
     const complete = () => {
         pause();
+
         elBody.classList.add('finished');
         playNotification();
+
         elReminder.classList.add('show');
+
         elToggle.textContent = "Restart";
+
         timeLeft = initialDuration;
         updateUI();
     };
 
     const reset = () => {
         pause();
+
         elBody.classList.remove('finished');
-        elReminder.classList.remove('show');
+        resetCelebrationAnimation();
+
         timeLeft = initialDuration;
         elToggle.textContent = "Start";
+
         updateUI();
     };
 
-    elToggle.addEventListener('click', () => (timerId ? pause() : start()));
+    elToggle.addEventListener('click', () => timerId ? pause() : start());
     elReset.addEventListener('click', reset);
+
     updateUI();
 </script>
 
